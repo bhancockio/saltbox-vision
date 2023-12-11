@@ -3,7 +3,7 @@ import React from "react";
 
 function Loading() {
   return (
-    <div className="z-50 flex h-screen w-screen items-center justify-center bg-white">
+    <div className="z-50 flex h-screen w-screen items-center justify-center ">
       <div className="relative flex flex-col items-center justify-center">
         <Image
           src="/images/saltbox-logo.png"

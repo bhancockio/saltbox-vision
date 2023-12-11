@@ -7,12 +7,16 @@ import { usePathname } from "next/navigation";
 
 const routes = [
   {
-    name: "ORDERS",
-    path: "/orders",
+    name: "ITEM TYPES",
+    path: "/item-types",
   },
   {
     name: "ITEMS",
     path: "/items",
+  },
+  {
+    name: "ORDERS",
+    path: "/orders",
   },
 ];
 
