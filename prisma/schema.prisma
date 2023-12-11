@@ -54,7 +54,9 @@ model ItemType {
   visionInstruction   VisionInstruction? @relation(fields: [visionInstructionId], references: [id], onDelete: Cascade)
   visionInstructionId String?
 
+  @@unique([name])
   @@index([visionInstructionId])
+  @@index([name])
 }
 
 model VisionInstruction {
