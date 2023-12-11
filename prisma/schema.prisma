@@ -10,3 +10,57 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
+
+model Order {
+  id        String      @id @default(cuid())
+  orderDate DateTime    @default(now())
+  customer  String
+  address   String
+  city      String
+  state     String
+  amount    Float
+  status    String
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  orderId  String
+  itemId   String
+  quantity Int
+  order    Order  @relation(fields: [orderId], references: [id])
+  item     Item   @relation(fields: [itemId], references: [id])
+
+  @@index([orderId, itemId])
+  @@index([itemId])
+  @@index([orderId])
+}
+
+model Item {
+  id         String      @id @default(cuid())
+  itemTypeId String
+  itemType   ItemType    @relation(fields: [itemTypeId], references: [id])
+  orderItems OrderItem[]
+
+  @@index([itemTypeId])
+}
+
+model ItemType {
+  id    String @id @default(cuid())
+  name  String
+  price Float
+  items Item[]
+
+  visionInstruction   VisionInstruction? @relation(fields: [visionInstructionId], references: [id], onDelete: Cascade)
+  visionInstructionId String?
+
+  @@index([visionInstructionId])
+}
+
+model VisionInstruction {
+  id               String     @id @default(cuid())
+  description      String
+  trainingImageURL String
+  itemId           String
+  ItemType         ItemType[]
+}
