@@ -1,7 +1,7 @@
 "use client";
 
 import { Item, ItemType } from "@prisma/client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,18 +15,36 @@ import { Button } from "./ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { convertNumberToCurrency } from "@/lib/utils";
+import ItemTypesCard from "@/components/ItemTypesCard";
 
 interface ItemTypesContainerProps {
-  itemTypes: (ItemType & { items: Item[] })[];
+  itemTypes: ItemType[];
 }
 
 function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
   const [isCreating, setIsCreating] = useState(false);
+  const [hasChanged, setHasChanged] = useState(false);
+  const [localItemTypes, setLocalItemTypes] = useState<ItemType[]>(itemTypes);
+  const [editedItemType, setEditedItemType] = useState<ItemType | null>(null);
   const [selectedItemType, setSelectedItemType] = useState<ItemType | null>(
     null
   );
 
-  console.log(itemTypes);
+  useEffect(() => {
+    // Reset edited item type when selecting a new item type
+    if (selectedItemType?.id !== editedItemType?.id) {
+      setHasChanged(false);
+      setEditedItemType(selectedItemType);
+    } else {
+      console.log(
+        "has changed",
+        JSON.stringify(editedItemType) !== JSON.stringify(selectedItemType)
+      );
+      setHasChanged(
+        JSON.stringify(editedItemType) !== JSON.stringify(selectedItemType)
+      );
+    }
+  }, [selectedItemType, editedItemType]);
 
   const handleCreate = () => {
     setIsCreating(true);
@@ -38,7 +56,7 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
         const { success, message, data } = res.data;
         if (success) {
           setSelectedItemType(data);
-          itemTypes.push({ ...data, items: [] });
+          setLocalItemTypes((prev) => [...prev, data]);
           toast.success(message);
         } else {
           setSelectedItemType(null);
@@ -56,12 +74,69 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
       });
   };
 
+  const handleDelete = (id: string): Promise<void> => {
+    return axios
+      .delete(`/api/item-types?id=${id}`)
+      .then((res) => {
+        const { success, message } = res.data;
+        if (success) {
+          setLocalItemTypes((prev) =>
+            prev.filter((itemType) => itemType.id !== id)
+          );
+          setSelectedItemType(null);
+          toast.success(message);
+        } else {
+          toast.error(message);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(
+          "Something went wrong deleting Item Type. Please try again later."
+        );
+      });
+  };
+
+  const handleSave = (): Promise<void> => {
+    return axios
+      .put(`/api/item-types`, editedItemType)
+      .then((res) => {
+        const { success, message, data } = res.data;
+        if (success) {
+          setEditedItemType(data);
+          setLocalItemTypes((prev) => {
+            return prev.map((prevItemType) => {
+              if (prevItemType.id === data.id) {
+                return data;
+              }
+              return prevItemType;
+            });
+          });
+
+          console.log("data", data);
+          toast.success(message);
+        } else {
+          toast.error(message);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(
+          "Something went wrong editing Item Type. Please try again later."
+        );
+      });
+  };
+
   return (
     <div className="flex flex-row w-full h-full gap-x-6">
       <div className="w-1/2 flex flex-col">
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between mb-2">
           <h1 className="font-semibold text-2xl">Item Types</h1>
-          <Button variant="default" onClick={handleCreate}>
+          <Button
+            variant="default"
+            disabled={isCreating}
+            onClick={handleCreate}
+          >
             {isCreating ? "Creating" : "Create"}
           </Button>
         </div>
@@ -70,14 +145,13 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Count</TableHead>
               <TableHead className="text-right">
                 Saltbox Vision Enabled
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {itemTypes.map((itemType) => (
+            {localItemTypes.map((itemType) => (
               <TableRow
                 key={itemType.id}
                 onClick={() => setSelectedItemType(itemType)}
@@ -85,9 +159,9 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
               >
                 <TableCell>{itemType.name}</TableCell>
                 <TableCell>{convertNumberToCurrency(itemType.price)}</TableCell>
-                <TableCell>{itemType.items?.length ?? 0}</TableCell>
                 <TableCell className="flex flex-row justify-end ">
-                  {itemType.visionInstructionId ? (
+                  {itemType.qualityControlInstructions &&
+                  itemType.qualityControlImageURL ? (
                     <IoMdEye className="text-primary" />
                   ) : (
                     <IoMdEyeOff />
@@ -106,17 +180,16 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
         )}
       </div>
       <div className="w-1/2 flex flex-col">
-        <div className="bg-white w-full min-h-[300px] rounded-md drop-shadow-lg p-4 flex flex-col">
-          {selectedItemType ? (
-            <div>{selectedItemType.id}</div>
-          ) : (
-            <div className="text-center my-auto">
-              <p className="text-gray-500 ">
-                No item type selected. Please select one from the list.
-              </p>
-            </div>
-          )}
-        </div>
+        <ItemTypesCard
+          itemTypes={itemTypes}
+          selectedItemType={selectedItemType}
+          setSelectedItemType={setSelectedItemType}
+          handleDelete={handleDelete}
+          handleSave={handleSave}
+          setEditedItemType={setEditedItemType}
+          editedItemType={editedItemType}
+          hasChanged={hasChanged}
+        />
       </div>
     </div>
   );

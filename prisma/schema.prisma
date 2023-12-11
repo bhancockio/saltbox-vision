@@ -46,23 +46,16 @@ model Item {
 }
 
 model ItemType {
-  id    String @id @default(cuid())
-  name  String
-  price Float
-  items Item[]
-
-  visionInstruction   VisionInstruction? @relation(fields: [visionInstructionId], references: [id], onDelete: Cascade)
-  visionInstructionId String?
+  id                         String   @id @default(cuid())
+  name                       String
+  price                      Float
+  items                      Item[]
+  description                String
+  qualityControlInstructions String?  @db.Text
+  qualityControlImageURL     String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 
   @@unique([name])
-  @@index([visionInstructionId])
   @@index([name])
-}
-
-model VisionInstruction {
-  id               String     @id @default(cuid())
-  description      String
-  trainingImageURL String
-  itemId           String
-  ItemType         ItemType[]
 }
