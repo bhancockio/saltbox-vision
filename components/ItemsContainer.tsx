@@ -80,7 +80,7 @@ function ItemsContainer({ items }: ItemsContainerProps) {
           ))}
         </TableBody>
       </Table>
-      {items.length === 0 && (
+      {localItems.length === 0 && (
         <div className="text-center w-full my-2">
           <p className="text-gray-500">
             No items found. Please seed with dummy data.

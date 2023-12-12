@@ -7,8 +7,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Textarea } from "./ui/textarea";
 import "@uploadthing/react/styles.css";
-import { UploadButton } from "@/lib/uploadthing";
-import { set } from "zod";
+import { ItemTypeUploadButton } from "@/lib/uploadthing";
 
 interface ItemsTypeCardProps {
   selectedItemType: ItemType | null;
@@ -96,15 +95,14 @@ function ItemTypesCard({
                 </p>
               </div>
             )}
-            <UploadButton
+            <ItemTypeUploadButton
               input={{ itemTypeId: selectedItemType.id }}
               appearance={{
                 button:
                   "bg-white-500 border text-black border-[#fcb503] hover:bg-[#fcb503] hover:text-white focus-within:ring-[#fcb503] after:bg-[#fcb503]",
               }}
-              endpoint="imageUploader"
+              endpoint="itemTypeImageUploader"
               onClientUploadComplete={(res) => {
-                // Do something with the response
                 console.log("Files: ", res);
                 if (res && (res?.length ?? 0) > 0) {
                   toast.success("Successfully uploaded image!");
@@ -121,7 +119,6 @@ function ItemTypesCard({
                 }
               }}
               onUploadError={(error: Error) => {
-                // Do something with the error.
                 alert(`ERROR! ${error.message}`);
               }}
             />

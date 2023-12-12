@@ -21,19 +21,27 @@ model Order {
   amount    Float
   status    String
   items     OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 model OrderItem {
-  id       String @id @default(cuid())
-  orderId  String
-  itemId   String
-  quantity Int
-  order    Order  @relation(fields: [orderId], references: [id])
-  item     Item   @relation(fields: [itemId], references: [id])
+  id                     String   @id @default(cuid())
+  orderId                String
+  itemId                 String
+  quantity               Int
+  qualityControlImageURL String?
+  qualityControlNotes    String?
+  qualityControlStatus   String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  order                  Order    @relation(fields: [orderId], references: [id])
+  item                   Item     @relation(fields: [itemId], references: [id])
 
   @@index([orderId, itemId])
   @@index([itemId])
   @@index([orderId])
+  @@index([createdAt(sort: Desc)])
 }
 
 model Item {

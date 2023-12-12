@@ -99,7 +99,7 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
 
   const handleSave = (): Promise<void> => {
     return axios
-      .put(`/api/item-types`, editedItemType)
+      .put(`/api/item-type`, editedItemType)
       .then((res) => {
         const { success, message, data } = res.data;
         if (success) {
@@ -171,7 +171,7 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
             ))}
           </TableBody>
         </Table>
-        {itemTypes.length === 0 && (
+        {localItemTypes.length === 0 && (
           <div className="text-center w-full my-2">
             <p className="text-gray-500">
               No item types found. Please create a new one.

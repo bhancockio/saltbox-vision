@@ -1,8 +1,12 @@
 import { createNextRouteHandler } from "uploadthing/next";
+import { itemTypeFileRouter, orderFileRouter } from "./core";
 
-import { uploadThingFileRouter } from "./core";
+const combinedRouters = {
+  ...itemTypeFileRouter,
+  ...orderFileRouter,
+};
 
 // Export routes for Next App Router
 export const { GET, POST } = createNextRouteHandler({
-  router: uploadThingFileRouter,
+  router: combinedRouters,
 });

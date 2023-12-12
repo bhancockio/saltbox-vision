@@ -16,9 +16,11 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@uploadthing/react": "^6.0.2",
     "axios": "^1.6.2",
+    "chance": "^1.1.11",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "lucide-react": "^0.294.0",
+    "moment": "^2.29.4",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
@@ -30,6 +32,8 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/chance": "^1.1.6",
+    "@types/faker": "^6.6.9",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
