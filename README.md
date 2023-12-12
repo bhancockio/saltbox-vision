@@ -12,3 +12,4 @@
 - Order Page
   - Handle multiple items ordered at the same time
 - Refactor similar container componets to decrease duplicate code & increase shared formatting.
+- Update AI validation feedback process

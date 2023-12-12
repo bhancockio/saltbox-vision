@@ -106,18 +106,8 @@ function OrdersContainer({ orderItems }: OrdersContainerProps) {
         <OrderCard
           orderItem={selectedOrderItem}
           setOrderItem={setSelectedOrderItem}
+          setOrderItems={setLocalOrderItems}
         />
-
-        {/* <ItemTypesCard
-          itemTypes={itemTypes}
-          selectedItemType={selectedItemType}
-          setSelectedItemType={setSelectedItemType}
-          handleDelete={handleDelete}
-          handleSave={handleSave}
-          setEditedItemType={setEditedItemType}
-          editedItemType={editedItemType}
-          hasChanged={hasChanged}
-        /> */}
       </div>
     </div>
   );

@@ -1,18 +1,39 @@
 import { HydratedOrderItem } from "@/app/(dashboard)/orders/page";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Label } from "./ui/label";
 import { OrderFileUploadButton } from "@/lib/uploadthing";
 import toast from "react-hot-toast";
 import { Button } from "./ui/button";
 import axios from "axios";
+import "@uploadthing/react/styles.css";
 
 interface OrdersCardProps {
   orderItem: HydratedOrderItem | null;
   setOrderItem: Dispatch<SetStateAction<HydratedOrderItem | null>>;
+  setOrderItems: Dispatch<SetStateAction<HydratedOrderItem[]>>;
 }
 
-function OrderCard({ orderItem, setOrderItem }: OrdersCardProps) {
+function OrderCard({
+  orderItem,
+  setOrderItem,
+  setOrderItems,
+}: OrdersCardProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const [isApprovable, setIsApprovable] = useState(false);
+
+  useEffect(() => {
+    const includesQualityControl =
+      orderItem?.item.itemType.qualityControlImageURL;
+
+    if (includesQualityControl) {
+      setIsApprovable(orderItem?.qualityControlStatus === "Pass");
+    } else {
+      setIsApprovable(true);
+    }
+  }, [orderItem]);
+
+  console.log("isApprovable", isApprovable);
 
   const handleValidate = async (orderItemId: string) => {
     setIsValidating(true);
@@ -39,6 +60,39 @@ function OrderCard({ orderItem, setOrderItem }: OrdersCardProps) {
       })
       .finally(() => {
         setIsValidating(false);
+      });
+  };
+
+  const processOrder = (orderItemId: string) => {
+    // TODO: Officially process order.
+    // In the meantime, just delete it.
+    setIsProcessing(true);
+    axios
+      .delete<{
+        message: string;
+        success: boolean;
+        data: HydratedOrderItem;
+      }>(`/api/order-item?id=${orderItemId}`)
+      .then((res) => {
+        const { success, message } = res.data;
+        if (success) {
+          setOrderItems((prev) =>
+            prev.filter((orderItem) => orderItem.id !== orderItemId)
+          );
+          setOrderItem(null);
+          toast.success(message);
+        } else {
+          toast.error(message);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(
+          "Something went wrong deleting order item. Please try again later."
+        );
+      })
+      .finally(() => {
+        setIsProcessing(false);
       });
   };
 
@@ -122,19 +176,34 @@ function OrderCard({ orderItem, setOrderItem }: OrdersCardProps) {
                   }}
                 />
                 {orderItem.qualityControlImageURL && (
-                  <div className="flex flex-row justify-center my-4">
-                    <Button onClick={() => handleValidate(orderItem.id)}>
-                      {isValidating ? "Validating..." : "Validate"}
-                    </Button>
-                  </div>
+                  <>
+                    <div className="flex flex-row justify-center my-4">
+                      <Button onClick={() => handleValidate(orderItem.id)}>
+                        {isValidating ? "Validating..." : "Validate"}
+                      </Button>
+                    </div>
+                    {orderItem.qualityControlStatus !== null && (
+                      <div className="flex flex-col gap-y-4">
+                        <Label>
+                          Validation Status: {orderItem.qualityControlStatus}
+                        </Label>
+                        <div>
+                          <Label>Validation Notes:</Label>
+                          <p>{orderItem.qualityControlNotes?.trim()}</p>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
-              </div>
-
-              <div>
-                <Label>Validate Quality Control:</Label>
               </div>
             </>
           )}
+        <Button
+          disabled={!isApprovable}
+          onClick={() => processOrder(orderItem.id)}
+        >
+          {isProcessing ? "Processing..." : "Process Order"}
+        </Button>
       </div>
     </div>
   );

@@ -3,7 +3,6 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { Textarea } from "./ui/textarea";
 import "@uploadthing/react/styles.css";
