@@ -1,6 +1,6 @@
 "use client";
 
-import { Item, ItemType } from "@prisma/client";
+import { ItemType } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -50,7 +50,7 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
     setIsCreating(true);
     axios
       .post<{ success: boolean; message: string; data: ItemType }>(
-        "/api/item-types"
+        "/api/item-type"
       )
       .then((res) => {
         const { success, message, data } = res.data;
@@ -76,7 +76,7 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
 
   const handleDelete = (id: string): Promise<void> => {
     return axios
-      .delete(`/api/item-types?id=${id}`)
+      .delete(`/api/item-type?id=${id}`)
       .then((res) => {
         const { success, message } = res.data;
         if (success) {
@@ -174,7 +174,7 @@ function ItemTypesContainer({ itemTypes }: ItemTypesContainerProps) {
         {itemTypes.length === 0 && (
           <div className="text-center w-full my-2">
             <p className="text-gray-500">
-              No items found. Please create a new one or seed with dummy data.
+              No item types found. Please create a new one.
             </p>
           </div>
         )}

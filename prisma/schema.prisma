@@ -41,8 +41,10 @@ model Item {
   itemTypeId String
   itemType   ItemType    @relation(fields: [itemTypeId], references: [id])
   orderItems OrderItem[]
+  createdAt  DateTime    @default(now())
 
   @@index([itemTypeId])
+  @@index([createdAt(sort: Desc)])
 }
 
 model ItemType {
@@ -57,5 +59,4 @@ model ItemType {
   updatedAt                  DateTime @updatedAt
 
   @@unique([name])
-  @@index([name])
 }

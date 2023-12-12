@@ -1,6 +1,5 @@
 import ItemTypesContainer from "@/components/ItemTypesContainer";
 import { prismadb } from "@/lib/prismadb";
-import { ItemType } from "@prisma/client";
 
 const fetchItemTypess = async () => {
   return prismadb.itemType.findMany({
